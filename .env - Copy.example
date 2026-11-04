@@ -1,7 +1,0 @@
-# Copy this file to ".env" and put YOUR MySQL details here.
-# The real .env file must never be shared or uploaded to GitHub.
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_mysql_password_here
-DB_NAME=smart_college
