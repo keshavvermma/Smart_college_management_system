@@ -1,56 +1,181 @@
 """
-config.py - central configuration for the Smart College Management System.
+config.py - Central configuration for Smart College Management System.
 
-Database credentials are NEVER written in the source code. They are read from
-environment variables, which can be placed in a ".env" file (see .env.example).
+Supports:
+1. Local MySQL using .env
+2. Cloud MySQL using Streamlit Secrets
+3. Aiven MySQL with SSL
 """
+
 import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-# Load variables from the .env file (if python-dotenv is installed and the file exists)
+
+# ------------------------------------------------------------
+# Load local environment variables
+# ------------------------------------------------------------
+
 try:
     from dotenv import load_dotenv
-
     load_dotenv(BASE_DIR / ".env")
-except ImportError:  # the app still works if variables are set in Windows itself
+except ImportError:
     pass
 
-# ---------------------------------------------------------------- database
+
+# ------------------------------------------------------------
+# Read settings from Streamlit Secrets or environment variables
+# ------------------------------------------------------------
+
+def get_setting(key, default=None):
+
+    try:
+        import streamlit as st
+
+        if key in st.secrets:
+            return st.secrets[key]
+
+    except Exception:
+        pass
+
+    return os.getenv(key, default)
+
+
+# ------------------------------------------------------------
+# Database configuration
+# ------------------------------------------------------------
+
+DB_HOST = get_setting("DB_HOST", "localhost")
+DB_PORT = int(get_setting("DB_PORT", "3306"))
+DB_USER = get_setting("DB_USER", "root")
+DB_PASSWORD = get_setting("DB_PASSWORD", "")
+DB_NAME = get_setting("DB_NAME", "smart_college")
+
 DB_CONFIG = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "port": int(os.getenv("DB_PORT", "3306")),
-    "user": os.getenv("DB_USER", "root"),
-    "password": os.getenv("DB_PASSWORD", ""),
-    "database": os.getenv("DB_NAME", "smart_college"),
+    "host": DB_HOST,
+    "port": DB_PORT,
+    "user": DB_USER,
+    "password": DB_PASSWORD,
+    "database": DB_NAME,
+    "connect_timeout": 15,
 }
 
-# ------------------------------------------------------------ application
+
+# ------------------------------------------------------------
+# SSL configuration for Aiven MySQL
+# ------------------------------------------------------------
+
+# ------------------------------------------------------------
+# SSL configuration for Aiven MySQL
+# ------------------------------------------------------------
+
+SSL_CA = get_setting("DB_SSL_CA", "")
+
+if SSL_CA:
+    ca_path = Path(SSL_CA)
+
+    # Resolve relative paths from project folder
+    if not ca_path.is_absolute():
+        ca_path = BASE_DIR / ca_path
+
+    if not ca_path.exists():
+        raise FileNotFoundError(
+            f"SSL CA certificate not found: {ca_path}"
+        )
+
+    DB_CONFIG["ssl_ca"] = str(ca_path)
+    DB_CONFIG["ssl_verify_cert"] = True
+    DB_CONFIG["ssl_verify_identity"] = True
+
+
+# ------------------------------------------------------------
+# Application settings
+# ------------------------------------------------------------
+
 APP_NAME = "Smart College Management System"
 APP_TITLE = APP_NAME
-COLLEGE_NAME = os.getenv("COLLEGE_NAME", "Smart Institute of Engineering & Technology")
+
+COLLEGE_NAME = get_setting(
+    "COLLEGE_NAME",
+    "Smart Institute of Engineering & Technology"
+)
+
 LOGO_PATH = BASE_DIR / "assets" / "logo.png"
 
-# ---------------------------------------------------------- academic rules
-ATTENDANCE_THRESHOLD = 75      # % - below this a warning is shown
-PASS_PERCENTAGE = 40           # % - below this the result is "Fail"
-EXAM_TYPES = ["Internal", "Mid Term", "Practical", "End Semester"]
+
+# ------------------------------------------------------------
+# Academic rules
+# ------------------------------------------------------------
+
+ATTENDANCE_THRESHOLD = 75
+PASS_PERCENTAGE = 40
+
+EXAM_TYPES = [
+    "Internal",
+    "Mid Term",
+    "Practical",
+    "End Semester"
+]
+
 SEMESTERS = list(range(1, 9))
-DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-PRIORITIES = ["Normal", "Important", "Urgent"]
+
+DAYS = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
+]
+
+PRIORITIES = [
+    "Normal",
+    "Important",
+    "Urgent"
+]
+
 NOTICE_PRIORITIES = PRIORITIES
-GENDERS = ["Male", "Female", "Other"]
-DESIGNATIONS = ["Professor", "Associate Professor", "Assistant Professor", "Lecturer", "Lab Instructor"]
-# default "maximum marks" suggested on the marks-entry screen for each exam type
-DEFAULT_MAX_MARKS = {"Internal": 30, "Mid Term": 50, "Practical": 25, "End Semester": 100}
 
-# ---------------------------------------------------------------- security
-# Initial passwords given to accounts created from the Admin screens.
-# Users can change them from the Settings page.
-DEFAULT_STUDENT_PASSWORD = os.getenv("DEFAULT_STUDENT_PASSWORD", "Student@123")
-DEFAULT_FACULTY_PASSWORD = os.getenv("DEFAULT_FACULTY_PASSWORD", "Faculty@123")
+GENDERS = [
+    "Male",
+    "Female",
+    "Other"
+]
 
-SESSION_TIMEOUT_MINUTES = int(os.getenv("SESSION_TIMEOUT_MINUTES", "30"))
-MAX_LOGIN_ATTEMPTS = 5         # failed logins before a short lock-out
+DESIGNATIONS = [
+    "Professor",
+    "Associate Professor",
+    "Assistant Professor",
+    "Lecturer",
+    "Lab Instructor"
+]
+
+DEFAULT_MAX_MARKS = {
+    "Internal": 30,
+    "Mid Term": 50,
+    "Practical": 25,
+    "End Semester": 100
+}
+
+
+# ------------------------------------------------------------
+# Security settings
+# ------------------------------------------------------------
+
+DEFAULT_STUDENT_PASSWORD = get_setting(
+    "DEFAULT_STUDENT_PASSWORD",
+    "Student@123"
+)
+
+DEFAULT_FACULTY_PASSWORD = get_setting(
+    "DEFAULT_FACULTY_PASSWORD",
+    "Faculty@123"
+)
+
+SESSION_TIMEOUT_MINUTES = int(
+    get_setting("SESSION_TIMEOUT_MINUTES", "30")
+)
+
+MAX_LOGIN_ATTEMPTS = 5
 LOCKOUT_SECONDS = 60
