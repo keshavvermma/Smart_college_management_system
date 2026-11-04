@@ -1,0 +1,27 @@
+flowchart LR
+    Admin([Admin]):::actor
+    Faculty([Faculty]):::actor
+    Student([Student]):::actor
+    subgraph SYS[Smart College Management System]
+        UC0(Login / Logout)
+        UC1(Manage students)
+        UC2(Manage faculty and assign subjects)
+        UC3(Manage departments)
+        UC4(Manage subjects)
+        UC5(Mark attendance)
+        UC6(Enter / update marks)
+        UC7(Create, edit, publish notices)
+        UC8(Manage timetable)
+        UC9(Generate reports CSV / PDF)
+        UC10(View dashboard and analytics)
+        UC11(View own profile)
+        UC12(View own attendance and warnings)
+        UC13(View own marks and results)
+        UC14(View timetable)
+        UC15(View notices)
+        UC16(Change password)
+    end
+    Admin --> UC0 & UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7 & UC8 & UC9 & UC10 & UC16
+    Faculty --> UC0 & UC5 & UC6 & UC7 & UC10 & UC14 & UC16
+    Student --> UC0 & UC11 & UC12 & UC13 & UC14 & UC15 & UC16
+    classDef actor fill:#1E3A8A,color:#fff

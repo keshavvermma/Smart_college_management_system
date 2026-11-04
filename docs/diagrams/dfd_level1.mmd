@@ -1,0 +1,26 @@
+flowchart TB
+    A([Admin]) --> P1
+    F([Faculty]) --> P1
+    ST([Student]) --> P1
+    P1((1.0<br/>Authentication<br/>and sessions)) <--> D1[(D1 users)]
+    P1 --> P2((2.0 Master data<br/>students, faculty,<br/>departments, subjects))
+    P2 <--> D2[(D2 students, faculty,<br/>departments, subjects)]
+    F --> P3((3.0 Attendance))
+    A --> P3
+    P3 <--> D3[(D3 attendance)]
+    P3 -. "reads class list" .-> D2
+    F --> P4((4.0 Marks<br/>and results))
+    A --> P4
+    P4 <--> D4[(D4 marks)]
+    P4 -. "grade, % rules" .-> P4
+    A --> P5((5.0 Notices<br/>and timetable))
+    F --> P5
+    P5 <--> D5[(D5 notices, timetable)]
+    D2 --> P6((6.0 Reports<br/>and analytics))
+    D3 --> P6
+    D4 --> P6
+    P6 --> A
+    P6 --> ST
+    D3 --> P7((7.0 Power BI<br/>views))
+    D4 --> P7
+    D2 --> P7

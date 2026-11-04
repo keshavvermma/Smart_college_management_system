@@ -1,0 +1,12 @@
+flowchart TB
+    U[Browser: Admin / Faculty / Student] --> APP
+    subgraph APP[Streamlit application]
+        direction TB
+        N[app.py: login + role based navigation] --> PG[pages/: screens]
+        PG --> UT[utils/: authentication, validators, calculations, ui]
+        PG --> Q[database/queries.py: parameterised SQL]
+        Q --> C[database/connection.py: mysql-connector-python]
+    end
+    C --> DB[(MySQL 8: smart_college<br/>tables + views)]
+    DB --> PBI[Power BI Desktop]
+    ENV[.env: DB credentials] --> C

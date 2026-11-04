@@ -1,0 +1,75 @@
+erDiagram
+    DEPARTMENTS ||--o{ STUDENTS : "has"
+    DEPARTMENTS ||--o{ FACULTY : "employs"
+    DEPARTMENTS ||--o{ SUBJECTS : "offers"
+    DEPARTMENTS ||--o{ TIMETABLE : "schedules"
+    FACULTY ||--o{ SUBJECTS : "teaches"
+    FACULTY ||--o{ ATTENDANCE : "marks"
+    STUDENTS ||--o{ ATTENDANCE : "has"
+    SUBJECTS ||--o{ ATTENDANCE : "recorded for"
+    STUDENTS ||--o{ MARKS : "scores"
+    SUBJECTS ||--o{ MARKS : "assessed in"
+    SUBJECTS ||--o{ TIMETABLE : "slot of"
+    USERS ||--o{ NOTICES : "posts"
+    USERS }o--o| STUDENTS : "login of (ref_id)"
+    USERS }o--o| FACULTY : "login of (ref_id)"
+    DEPARTMENTS { int department_id PK
+        string dept_name UK
+        string dept_code UK }
+    STUDENTS { int student_id PK
+        string roll_no UK
+        string name
+        enum gender
+        date date_of_birth
+        int department_id FK
+        int semester
+        string email UK
+        string phone
+        string address
+        int admission_year }
+    FACULTY { int faculty_id PK
+        string name
+        string email UK
+        string phone
+        int department_id FK
+        string designation
+        date joining_date }
+    SUBJECTS { int subject_id PK
+        string subject_code UK
+        string subject_name
+        int department_id FK
+        int semester
+        int credits
+        int faculty_id FK }
+    ATTENDANCE { int attendance_id PK
+        int student_id FK
+        int subject_id FK
+        int faculty_id FK
+        date date
+        enum status }
+    MARKS { int mark_id PK
+        int student_id FK
+        int subject_id FK
+        enum exam_type
+        decimal marks
+        decimal max_marks }
+    NOTICES { int notice_id PK
+        string title
+        text description
+        int created_by FK
+        timestamp created_at
+        enum priority
+        bool is_published }
+    TIMETABLE { int timetable_id PK
+        int department_id FK
+        int semester
+        int subject_id FK
+        enum day_of_week
+        time start_time
+        time end_time
+        string room }
+    USERS { int user_id PK
+        string username UK
+        string password_hash
+        enum role
+        int ref_id }

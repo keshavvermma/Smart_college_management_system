@@ -1,0 +1,9 @@
+flowchart LR
+    A([Admin]) -- "manage master data, notices, reports" --> S((Smart College<br/>Management System))
+    F([Faculty]) -- "attendance, marks, notices" --> S
+    ST([Student]) -- "login, view requests" --> S
+    S -- "dashboards, reports, warnings" --> A
+    S -- "class lists, assigned subjects" --> F
+    S -- "own profile, attendance, marks, timetable, notices" --> ST
+    S <--> DB[(MySQL<br/>smart_college)]
+    DB -- "views" --> PBI[Power BI<br/>dashboards]
