@@ -46,7 +46,6 @@ def login_page():
                 st.rerun()
             else:
                 st.error(message)
-        st.info("Demo logins are listed in the README (for example admin / admin123).")
 
 
 def pages_for(role):
